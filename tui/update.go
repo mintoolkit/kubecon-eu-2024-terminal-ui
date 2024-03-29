@@ -49,9 +49,6 @@ func (m *model) handleDefaultState(msg tea.Msg) tea.Cmd {
 	)
 
 	switch msg := msg.(type) {
-	case tea.MouseMsg:
-		m.viewport, cmd = m.viewport.Update(msg)
-		cmds = append(cmds, cmd)
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEscape:
@@ -63,11 +60,16 @@ func (m *model) handleDefaultState(msg tea.Msg) tea.Cmd {
 		case tea.KeyUp, tea.KeyDown, tea.KeyLeft, tea.KeyRight:
 			m.list, cmd = m.list.Update(msg)
 			cmds = append(cmds, cmd)
-			m.viewport.GotoTop()
-			m.viewport.SetContent(m.viewportContent(m.viewport.Width))
+			m.layers, cmd = m.layers.Update(msg)
+			cmds = append(cmds, cmd)
+			// m.viewport.GotoTop()
+			// m.viewport.SetContent(m.viewportContent(m.viewport.Width))
 		}
 	default:
 		m.list, cmd = m.list.Update(msg)
+		cmds = append(cmds, cmd)
+
+		m.layers, cmd = m.layers.Update(msg)
 		cmds = append(cmds, cmd)
 
 		m.viewport, cmd = m.viewport.Update(msg)

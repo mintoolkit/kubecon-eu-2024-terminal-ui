@@ -49,7 +49,7 @@ func (m model) viewportContent(width int) string {
 }
 
 func (m model) detailView() string {
-	return m.viewport.View()
+	return m.layers.View()
 }
 
 func (m model) statusView() string {
