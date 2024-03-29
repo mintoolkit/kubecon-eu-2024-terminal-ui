@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -19,14 +21,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.statusMessage = msg.err.Error()
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
+		log.Printf("Width: %d Height: %d", m.width, m.height)
 		statusBarHeight := lipgloss.Height(m.statusView())
 		height := m.height - statusBarHeight
-
 		listViewWidth := cast.ToInt(ListProportion * float64(m.width))
 		listWidth := listViewWidth - listViewStyle.GetHorizontalFrameSize()
+		log.Printf("list width height: %d %d", listWidth, height)
 		m.list.SetSize(listWidth, height)
 
-		detailViewWidth := m.width - listViewWidth
+		detailViewWidth := m.width - listWidth
+		log.Printf("viewport: %d %d", detailViewWidth, height)
+		m.layers.SetSize(detailViewWidth, height)
 		m.viewport = viewport.New(detailViewWidth, height)
 		m.viewport.MouseWheelEnabled = true
 		m.viewport.SetContent(m.viewportContent(m.viewport.Width))

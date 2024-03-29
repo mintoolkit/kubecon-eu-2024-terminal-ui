@@ -54,13 +54,18 @@ func New(data report.XrayCommand) (*model, error) {
 	var layersItems []list.Item
 	for _, layerInfo := range data.ImageLayers {
 		layer := item{
-			title: fmt.Sprintf("%d", layerInfo.Index),
+			title: fmt.Sprintf("Index: %d", layerInfo.Index),
 			desc:  layerInfo.ID,
 		}
 		layersItems = append(layersItems, layer)
 	}
 
 	layers := list.New(layersItems, list.NewDefaultDelegate(), 0, 0)
+	layers.Title = "Layers"
+	layers.SetShowHelp(false)
+	layers.SetShowStatusBar(false)
+	layers.SetShowFilter(false)
+	layers.SetFilteringEnabled(false)
 
 	return &model{
 		list:   l,

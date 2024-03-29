@@ -49,7 +49,7 @@ func (m model) viewportContent(width int) string {
 }
 
 func (m model) detailView() string {
-	return m.layers.View()
+	return listViewStyle.Render(m.layers.View())
 }
 
 func (m model) statusView() string {
