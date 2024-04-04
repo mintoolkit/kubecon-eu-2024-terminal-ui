@@ -4,7 +4,6 @@ import "github.com/charmbracelet/bubbles/key"
 
 // keyMap defines the keybindings for the app.
 type keyMap struct {
-	reload key.Binding
 	search key.Binding
 }
 

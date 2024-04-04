@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/mintoolkit/mint/pkg/report"
@@ -19,6 +21,7 @@ type model struct {
 	width, height int
 
 	list     list.Model
+	layers   list.Model
 	viewport viewport.Model
 
 	statusMessage string
@@ -48,9 +51,26 @@ func New(data report.XrayCommand) (*model, error) {
 	l.SetShowFilter(false)
 	l.SetFilteringEnabled(false)
 
+	var layersItems []list.Item
+	for _, layerInfo := range data.ImageLayers {
+		layer := item{
+			title: fmt.Sprintf("Index: %d", layerInfo.Index),
+			desc:  layerInfo.ID,
+		}
+		layersItems = append(layersItems, layer)
+	}
+
+	layers := list.New(layersItems, list.NewDefaultDelegate(), 0, 0)
+	layers.Title = "Layers"
+	layers.SetShowHelp(false)
+	layers.SetShowStatusBar(false)
+	layers.SetShowFilter(false)
+	layers.SetFilteringEnabled(false)
+
 	return &model{
-		list:  l,
-		limit: 30,
+		list:   l,
+		layers: layers,
+		limit:  30,
 
 		keyMap: defaultKeyMap(),
 		state:  defaultState,

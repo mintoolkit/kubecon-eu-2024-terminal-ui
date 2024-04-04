@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -19,14 +21,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.statusMessage = msg.err.Error()
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
+		log.Printf("Width: %d Height: %d", m.width, m.height)
 		statusBarHeight := lipgloss.Height(m.statusView())
 		height := m.height - statusBarHeight
-
 		listViewWidth := cast.ToInt(ListProportion * float64(m.width))
 		listWidth := listViewWidth - listViewStyle.GetHorizontalFrameSize()
+		log.Printf("list width height: %d %d", listWidth, height)
 		m.list.SetSize(listWidth, height)
 
-		detailViewWidth := m.width - listViewWidth
+		detailViewWidth := m.width - listWidth
+		log.Printf("viewport: %d %d", detailViewWidth, height)
+		m.layers.SetSize(detailViewWidth, height)
 		m.viewport = viewport.New(detailViewWidth, height)
 		m.viewport.MouseWheelEnabled = true
 		m.viewport.SetContent(m.viewportContent(m.viewport.Width))
@@ -49,9 +54,6 @@ func (m *model) handleDefaultState(msg tea.Msg) tea.Cmd {
 	)
 
 	switch msg := msg.(type) {
-	case tea.MouseMsg:
-		m.viewport, cmd = m.viewport.Update(msg)
-		cmds = append(cmds, cmd)
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEscape:
@@ -63,11 +65,16 @@ func (m *model) handleDefaultState(msg tea.Msg) tea.Cmd {
 		case tea.KeyUp, tea.KeyDown, tea.KeyLeft, tea.KeyRight:
 			m.list, cmd = m.list.Update(msg)
 			cmds = append(cmds, cmd)
-			m.viewport.GotoTop()
-			m.viewport.SetContent(m.viewportContent(m.viewport.Width))
+			m.layers, cmd = m.layers.Update(msg)
+			cmds = append(cmds, cmd)
+			// m.viewport.GotoTop()
+			// m.viewport.SetContent(m.viewportContent(m.viewport.Width))
 		}
 	default:
 		m.list, cmd = m.list.Update(msg)
+		cmds = append(cmds, cmd)
+
+		m.layers, cmd = m.layers.Update(msg)
 		cmds = append(cmds, cmd)
 
 		m.viewport, cmd = m.viewport.Update(msg)
